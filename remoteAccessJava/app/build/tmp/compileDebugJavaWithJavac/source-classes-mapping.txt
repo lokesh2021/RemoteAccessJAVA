@@ -1,0 +1,4 @@
+com/example/sosjava/BuildConfig.java
+ com.example.sosjava.BuildConfig
+com/example/sosjava/MainActivity.java
+ com.example.sosjava.MainActivity
