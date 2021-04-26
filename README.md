@@ -6,3 +6,5 @@ It can be used by any Android Phone to get full access to your mobile. Any phone
 2) An SMS can help you change the sound profile of your phone (silent to normal).
 3) It helps you to get the location of your mobile.
 4) It can lock your mobile if your mobile doesn't have one. And many more.
+
+Weekly progress and blog regarding this project can be found at [https://2020-cse-19.blogspot.com/](https://2020-cse-19.blogspot.com/)
