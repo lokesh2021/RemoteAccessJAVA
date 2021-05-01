@@ -39,17 +39,19 @@ public class SmsListener extends BroadcastReceiver {
                         msg_from = msgs[i].getOriginatingAddress();
                         msgBody = msgs[i].getMessageBody();
                     }
+
+                    //responding to the message "remote_acess" with the message "Welcome Sir!, How can i help you?"
                     if (msgBody.equalsIgnoreCase("remote_access")) {
-                        sendSMSMessage(msg_from,"Welcome Sir!, How can i help you?");
-                        Log.d("debugging","sms sent");
+                        sendSMSMessage(msg_from, "Welcome Sir!, How can i help you?");
+                        Log.d("debugging", "sms sent");
                         Toast.makeText(context, "SMS sent", Toast.LENGTH_LONG).show();
-                    } else if(msgBody.split(" ")[0].equalsIgnoreCase("remote_access")&&msgBody.split(" ")[1].equalsIgnoreCase("--help")){
+                    } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                            && msgBody.split(" ")[1].equalsIgnoreCase("--help")) { //responding to the message "remote_acess --help" with instructions
                         sendMessageHelp(msg_from);
                     }
 
 
-
-                    Log.d("debugging","Message received from: " + msg_from + " \nand the message is :" + msgBody);
+                    Log.d("debugging", "Message received from: " + msg_from + " \nand the message is :" + msgBody);
                     Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Log.d("Exception caught", e.getMessage());
@@ -59,7 +61,7 @@ public class SmsListener extends BroadcastReceiver {
     }
 
     private void sendMessageHelp(String msg_from) {
-        String help_msg="Help Instructions"; //"remote_access <password> <action>"
+        String help_msg = "Help Instructions"; //"remote_access <password> <action>"
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(msg_from, null, help_msg, null, null);
     }
