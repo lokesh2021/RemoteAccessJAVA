@@ -34,10 +34,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="50dp"
-                android:src="@drawable/ic_group_41"
-                android:onClick="showRCMenu"/>
+                android:onClick="showRCMenu"
+                android:src="@drawable/ic_group_41" />
 
-<!--            Card design to display the app instrutions-->
+            <!--Card design to display the app instrutions-->
             <!--<androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
