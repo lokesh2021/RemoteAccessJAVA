@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class SmsListener extends BroadcastReceiver {
 
     private SharedPreferences preferences;
@@ -39,24 +41,41 @@ public class SmsListener extends BroadcastReceiver {
                         msg_from = msgs[i].getOriginatingAddress();
                         msgBody = msgs[i].getMessageBody();
                     }
+                    /*****************************
+                     Performs Actions for the received messages
+                     ******************************/
+                    processReceivedMessage(context, msg_from, msgBody);
 
-                    //responding to the message "remote_acess" with the message "Welcome Sir!, How can i help you?"
-                    if (msgBody.equalsIgnoreCase("remote_access")) {
-                        sendSMSMessage(msg_from, "Welcome Sir!, How can i help you?");
-                        Log.d("debugging", "sms sent");
-                        Toast.makeText(context, "SMS sent", Toast.LENGTH_LONG).show();
-                    } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                            && msgBody.split(" ")[1].equalsIgnoreCase("--help")) { //responding to the message "remote_acess --help" with instructions
-                        sendMessageHelp(msg_from);
-                    }
-
-
-                    Log.d("debugging", "Message received from: " + msg_from + " \nand the message is :" + msgBody);
-                    Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Log.d("Exception caught", e.getMessage());
                 }
             }
+        }
+    }
+
+    private void processReceivedMessage(Context context, String msg_from, String msgBody) {
+        //get the access_key from sharedpreference
+        String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
+
+        //responding to the message "remote_acess" with the message "Welcome Sir!, How can i help you?"
+        if (msgBody.equalsIgnoreCase("remote_access")) {
+            Log.d("debugging", "Message received from: " + msg_from + " \nand the message is :" + msgBody);
+            Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
+            //sending SMS to the Sender
+            sendSMSMessage(msg_from, "Welcome Sir!, How can i help you?");
+            Toast.makeText(context, "Access_key from sharepred is:" + shrpf_access_key, Toast.LENGTH_SHORT).show();
+            Log.d("debugging", "sharedpref value is : " + shrpf_access_key);
+            Log.d("debugging", "App has responded to the received SMS");
+            Toast.makeText(context, "App has responded to the received SMS", Toast.LENGTH_LONG).show();
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access") //responding to the message "remote_acess --help" with instructions
+                && msgBody.split(" ")[1].equalsIgnoreCase("--help")) {
+            sendMessageHelp(msg_from);
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equalsIgnoreCase(shrpf_access_key)) {
+            /***
+             password_authentication
+             ***/
+            sendSMSMessage(msg_from, "Password is Correct");
         }
     }
 

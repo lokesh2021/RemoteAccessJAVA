@@ -21,13 +21,14 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private EditText access_key_inp, reenter_access_key_inp;
+    private TextView error_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         /*****************************
-         to check if the required permissions are enabled or not
+         to check if the required permission is enabled or not
          ******************************/
         final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS};
         requestPermissions(permission, 1000);
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
      opens enable remote access menu
      ******************************/
     public void showRCMenu(View v) {
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(this, R.style.CustomAlertDialog);
         dialog.setContentView(R.layout.enable_rc_dialog);
 
         /*****************************
@@ -58,22 +59,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 access_key_inp = dialog.findViewById(R.id.access_key);
                 reenter_access_key_inp = dialog.findViewById(R.id.reenter_access_key);
+                error_text = dialog.findViewById(R.id.error_text);
                 /*****************************
                  if both the access keys are equal the password is set in sharedpreferences
                  else an error message is displayed on the screen
                  ******************************/
-                if (access_key_inp.getText().toString().equals(reenter_access_key_inp.getText().toString())) {
-                    SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-                    SharedPreferences.Editor shrd_pref_access_key = sharedPreferences.edit();
-                    shrd_pref_access_key.putString("access_key_inp", access_key_inp.toString());
-                    Toast.makeText(getApplicationContext(), access_key_inp.toString(), Toast.LENGTH_SHORT).show();
+                if (access_key_inp.getText().toString().length() < 5) {
+                    error_text.setText("Access Key's length cannot be less than 5, Please try again!!");
+                    error_text.setVisibility(View.VISIBLE);
+                } else if (access_key_inp.getText().toString().equals(reenter_access_key_inp.getText().toString())) {
+                    KeyValueDB.setSPData(getApplicationContext(), "access_key", access_key_inp.getText().toString());
+                    KeyValueDB.setSPData(getApplicationContext(), "ra_enabled", "yes");//next_update
+                    Toast.makeText(getApplicationContext(), "Access Key Successfully set to: " + access_key_inp.getText().toString(), Toast.LENGTH_SHORT).show();
                     dialog.findViewById(R.id.error_text).setVisibility(View.INVISIBLE);
-                    dialog.dismiss(); //dialog is dismissed when the password is set
-                    findViewById(R.id.enable_rc_button).setVisibility(View.INVISIBLE);// the button which opens the dialog is deleted
+                    dialog.dismiss(); //dialog is dismissed when the access key is set
+                    //next_update findViewById(R.id.enable_rc_button).setVisibility(View.INVISIBLE);// the button which opens the dialog is deleted
                     Toast.makeText(getApplicationContext(), "Remote Access Enabled!!", Toast.LENGTH_SHORT).show();
-                } else {
-                    dialog.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
-                }
+                } else dialog.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
 
             }
         });
