@@ -75,7 +75,7 @@ public class SmsListener extends BroadcastReceiver {
             /***
              password_authentication
              ***/
-            sendSMSMessage(msg_from, "Password is Correct");
+            sendSMSMessage(msg_from, "Password Authentication Successful");
         }
     }
 
