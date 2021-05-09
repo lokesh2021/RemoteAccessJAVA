@@ -37,6 +37,12 @@
                 android:onClick="showRCMenu"
                 android:src="@drawable/ic_group_41" />
 
+            <TextView
+                android:id="@+id/contacttextview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+
             <!--Card design to display the app instrutions-->
             <!--<androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
