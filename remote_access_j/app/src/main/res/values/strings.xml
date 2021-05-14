@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">Remote Access</string>
     <string name="enable_rc">Enable Remote Access</string>
+    <string name="choose_your_security_question">Choose your Security Question:</string>
+    <string name="access_keys_did_not_match_please_try_again">Access keys did not match, please try again!!</string>
+    <string name="re_enter_access_key">Re-enter Access Key</string>
+    <string name="access_key">Access Key</string>
+    <string name="save_access_key">Save Access Key</string>
+    <string name="disable_remote_access">Disable Remote Access</string>
+    <string name="edit_access_key">Edit Access Key</string>
+    <string name="save_changes">Save Changes</string>
     <!--<string name="keyword">remote_access</string>
     <string name="greeting">Welcome Sir!, How can i help you?</string>
     <string name="help_instructions">Help Instructions</string>-->

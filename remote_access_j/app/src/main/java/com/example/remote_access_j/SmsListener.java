@@ -71,11 +71,17 @@ public class SmsListener extends BroadcastReceiver {
                 && msgBody.split(" ")[1].equalsIgnoreCase("--help")) {
             sendMessageHelp(msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equalsIgnoreCase(shrpf_access_key)) {
+                && msgBody.split(" ")[1].equals(shrpf_access_key)) {
             /***
              password_authentication
              ***/
             sendSMSMessage(msg_from, "Password Authentication Successful");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1] != shrpf_access_key) {
+            /***
+             password_authentication
+             ***/
+            sendSMSMessage(msg_from, "Wrong Password, please try again!!!");
         }
     }
 

@@ -4,6 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class KeyValueDB {
+
+    /*
+     * AccesKey= "access_key"
+     * SecurityQuestion= "sq_question"
+     * SecurityAnswer= "sq_answer"
+     * Remote Access Enabled= "ra_enabled"
+     *
+     */
     private SharedPreferences sharedPreferences;
     private static String PREF_NAME = "prefs";
 
