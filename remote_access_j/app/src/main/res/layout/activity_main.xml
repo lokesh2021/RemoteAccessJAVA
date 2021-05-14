@@ -13,10 +13,11 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/welcome_to_ra"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="175dp"
@@ -42,6 +43,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Settings"
+                android:textSize="15sp"
+                app:strokeColor="@color/white"
+                app:strokeWidth="1dp"
+                android:gravity="center"
+                android:onClick="showAccessKeyVerificationDialog"/>
+
+            <!--<com.google.android.material.button.MaterialButton
+                android:id="@+id/edit_access_key_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/edit_access_key"
+                android:textSize="15sp"
+                app:strokeColor="@color/white"
+                app:strokeWidth="1dp"
+                android:gravity="center"
+                android:onClick="showEditRADialog"/>
+
+            <Button
+                android:id="@+id/disable_remote_access_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/white"
+                android:text="@string/disable_remote_access"
+                android:textColor="@color/primary_color_green" />-->
 
             <!--Card design to display the app instrutions-->
             <!--<androidx.cardview.widget.CardView
