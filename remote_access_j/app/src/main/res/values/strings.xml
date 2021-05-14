@@ -9,6 +9,7 @@
     <string name="disable_remote_access">Disable Remote Access</string>
     <string name="edit_access_key">Edit Access Key</string>
     <string name="save_changes">Save Changes</string>
+    <string name="verify_access_key">Verify Access Key</string>
     <!--<string name="keyword">remote_access</string>
     <string name="greeting">Welcome Sir!, How can i help you?</string>
     <string name="help_instructions">Help Instructions</string>-->

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Edit Remote Access Menu which is displayed after clicking on the Edit remote access button in the main_activity.xml layout
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/forgot_access_key_security_question_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your security question" />
+    <!--Access Key Input Field-->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/forgot_access_key_security_answer_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Security Answer" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <!--Re-enter New Access Key Input Field-->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/forgot_passwd_enter_new_acces_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter New Access Key" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/forgot_passwd_re_enter_new_acces_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Re-Enter New Access Key" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!--Error Message-->
+    <TextView
+        android:id="@+id/forgot_access_key_error_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/access_keys_did_not_match_please_try_again"
+        android:textColor="@color/red"
+        android:visibility="invisible" />
+
+
+    <Button
+        android:id="@+id/forgot_access_key_save_access_key_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:letterSpacing="0.1"
+        android:padding="14dp"
+        android:text="Save New Access Key"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+</LinearLayout>
