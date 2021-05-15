@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary_color_green"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/constraintlayout">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,14 +30,29 @@
                 android:textSize="42sp"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/enable_rc_button"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="50dp"
-                android:onClick="showRCMenu"
-                android:src="@drawable/ic_group_41" />
+                android:layout_gravity="center">
+                <ImageView
+                    android:id="@+id/enable_rc_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+
+                    android:onClick="showRCMenu"
+                    android:src="@drawable/ic_group_41" />
+
+                <ImageView
+                    android:id="@+id/ra_enabled_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ra_enabled_svg"
+                    android:visibility="invisible" />
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/contacttextview"
@@ -49,12 +65,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Settings"
-                android:textSize="15sp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="1dp"
+                android:layout_marginTop="100dp"
                 android:gravity="center"
-                android:onClick="showAccessKeyVerificationDialog"/>
+                android:onClick="showAccessKeyVerificationDialog"
+                android:paddingLeft="60dp"
+                android:paddingTop="15dp"
+                android:paddingRight="60dp"
+                android:paddingBottom="15dp"
+                android:letterSpacing="0.2"
+                android:textStyle="bold"
+                android:text="Settings"
+                android:textSize="16sp"
+                android:visibility="invisible"
+                app:cornerRadius="10dp"
+                app:strokeColor="@color/white"
+                app:strokeWidth="1dp" />
 
             <!--<com.google.android.material.button.MaterialButton
                 android:id="@+id/edit_access_key_button"

@@ -9,6 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class RADialog extends AppCompatActivity {
     private static EditText access_key_inp, reenter_access_key_inp, sq_answer;
@@ -36,26 +39,15 @@ public class RADialog extends AppCompatActivity {
         } else if (access_key_inp.getText().toString().equals(reenter_access_key_inp.getText().toString())) {
             KeyValueDB.setSPData(context, "access_key", access_key_inp.getText().toString());
             KeyValueDB.setSPData(context, "ra_enabled", "true");
-            Toast.makeText(context, "Access Key Successfully set to: " + access_key_inp.getText().toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Access Key Successfully set to: " + access_key_inp.getText().toString(), Toast.LENGTH_SHORT).show();
             dialog.findViewById(R.id.error_text).setVisibility(View.INVISIBLE);
             KeyValueDB.setSPData(context, "sq_answer", sq_answer.getText().toString());
-            Toast.makeText(context, "security answer is set to: " + sq_answer.getText().toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "security answer is set to: " + sq_answer.getText().toString(), Toast.LENGTH_SHORT).show();
             dialog.dismiss(); //dialog is dismissed when the access key is set
 
+            Globals.RAEnabled = 1;
+            KeyValueDB.setSPData(context, "ra_enabled", "yes");
 
-            
-            /*******************
-             * Error, yet to solve
-             */
-
-
-            enable_ra_button = findViewById(R.id.enable_rc_button);
-
-
-
-
-            enable_ra_button.setVisibility(View.INVISIBLE);// the button which opens the dialog is deleted
-            Toast.makeText(context, "Remote Access Enabled!!", Toast.LENGTH_SHORT).show();
         } else {
             dialog.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
             error_text.setText("Access keys did not match, please try again!!");
