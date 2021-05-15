@@ -211,8 +211,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         settings_disable_ra_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                KeyValueDB.setSPData(getApplicationContext(),"ra_enabled","no");
-                Globals.RAEnabled=0;
+                KeyValueDB.setSPData(getApplicationContext(), "ra_enabled", "no");
+                Globals.RAEnabled = 0;
                 Toast.makeText(MainActivity.this, "Remote Access Disabled, You cannot access any features of this application untill you enable it again", Toast.LENGTH_LONG).show();
                 recreate();
             }
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     forgot_aceess_key_error_text.setVisibility(View.INVISIBLE);
                     KeyValueDB.setSPData(getApplicationContext(), "access_key", forgot_access_key_new_access_key_text.getText().toString());
                     dialog.dismiss();
-                    Snackbar.make(constraintLayout, "Your New Access Key is set to: "+forgot_access_key_new_access_key_text.getText().toString(), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(constraintLayout, "Your New Access Key is set to: " + forgot_access_key_new_access_key_text.getText().toString(), Snackbar.LENGTH_LONG).show();
                     showAccessKeyVerificationDialog(v);
                 }
             }

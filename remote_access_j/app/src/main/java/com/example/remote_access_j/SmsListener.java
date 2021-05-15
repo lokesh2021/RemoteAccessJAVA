@@ -1,11 +1,13 @@
 package com.example.remote_access_j;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -13,13 +15,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import static android.content.Context.MODE_PRIVATE;
 
 public class SmsListener extends BroadcastReceiver {
 
-    private SharedPreferences preferences;
+    LocationManager locationManager;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -53,6 +53,7 @@ public class SmsListener extends BroadcastReceiver {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void processReceivedMessage(Context context, String msg_from, String msgBody) {
         //get the access_key from sharedpreference
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
@@ -71,6 +72,11 @@ public class SmsListener extends BroadcastReceiver {
                 && msgBody.split(" ")[1].equalsIgnoreCase("--help")) {
             sendMessageHelp(msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equals(shrpf_access_key)
+                && msg_from.split(" ")[2].equalsIgnoreCase("getlocation")) {
+
+            sendSMSMessage(msg_from, "getLocation activated");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key)) {
             /***
              password_authentication
@@ -78,9 +84,6 @@ public class SmsListener extends BroadcastReceiver {
             sendSMSMessage(msg_from, "Password Authentication Successful");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1] != shrpf_access_key) {
-            /***
-             password_authentication
-             ***/
             sendSMSMessage(msg_from, "Wrong Password, please try again!!!");
         }
     }
@@ -95,4 +98,5 @@ public class SmsListener extends BroadcastReceiver {
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
     }
+
 }
