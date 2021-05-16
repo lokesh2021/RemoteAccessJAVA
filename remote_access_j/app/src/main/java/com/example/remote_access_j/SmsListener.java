@@ -1,11 +1,13 @@
 package com.example.remote_access_j;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -13,14 +15,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import static android.content.Context.MODE_PRIVATE;
 
 public class SmsListener extends BroadcastReceiver {
 
-    private SharedPreferences preferences;
+    LocationManager locationManager;
 
+    //remote_access lokesh
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
@@ -53,35 +54,35 @@ public class SmsListener extends BroadcastReceiver {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void processReceivedMessage(Context context, String msg_from, String msgBody) {
         //get the access_key from sharedpreference
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
+        String shrpf_ra_enabled = KeyValueDB.getSPData(context, "ra_enabled");
 
         //responding to the message "remote_acess" with the message "Welcome Sir!, How can i help you?"
-        if (msgBody.equalsIgnoreCase("remote_access")) {
+        if (msgBody.equalsIgnoreCase("remote_access") && shrpf_ra_enabled.equals("yes")) {
             Log.d("debugging", "Message received from: " + msg_from + " \nand the message is :" + msgBody);
-            Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
             //sending SMS to the Sender
             sendSMSMessage(msg_from, "Welcome Sir!, How can i help you?");
-            Toast.makeText(context, "Access_key from sharepred is:" + shrpf_access_key, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Access_key from sharepred is:" + shrpf_access_key, Toast.LENGTH_SHORT).show();
             Log.d("debugging", "sharedpref value is : " + shrpf_access_key);
-            Log.d("debugging", "App has responded to the received SMS");
-            Toast.makeText(context, "App has responded to the received SMS", Toast.LENGTH_LONG).show();
+            Log.d("debugging", "Remote Access has responded to the received SMS");
+            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
+
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access") //responding to the message "remote_acess --help" with instructions
-                && msgBody.split(" ")[1].equalsIgnoreCase("--help")) {
+                && msgBody.split(" ")[1].equalsIgnoreCase("--help") && shrpf_ra_enabled.equals("yes")) {
             sendMessageHelp(msg_from);
+            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key)) {
-            /***
-             password_authentication
-             ***/
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && shrpf_ra_enabled.equals("yes")) {
+            Toast.makeText(context, "pswd auth successful :"+shrpf_ra_enabled+":"+shrpf_access_key, Toast.LENGTH_SHORT).show();
             sendSMSMessage(msg_from, "Password Authentication Successful");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1] != shrpf_access_key) {
-            /***
-             password_authentication
-             ***/
+                && msgBody.split(" ")[1] != shrpf_access_key && shrpf_ra_enabled.equals("yes")) {
             sendSMSMessage(msg_from, "Wrong Password, please try again!!!");
+            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -95,4 +96,5 @@ public class SmsListener extends BroadcastReceiver {
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
     }
+
 }

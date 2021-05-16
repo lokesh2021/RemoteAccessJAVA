@@ -9,22 +9,6 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
     android:orientation="vertical"
     android:padding="10dp">
 
-
-    <!--Access Key Input Field-->
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/old_access_key"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter Old Access Key" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-
     <!--Re-enter New Access Key Input Field-->
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -33,7 +17,7 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:layout_margin="10dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/new_acces_key"
+            android:id="@+id/edit_access_key_new_acces_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter New Access Key" />
@@ -46,23 +30,15 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:layout_margin="10dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/new_acces_key_rep"
+            android:id="@+id/edit_access_key_new_acces_key_rep"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Re-Enter New Access Key" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/forgot_access_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Forgot Access Key?"
-        android:textColor="@color/primary_color_green" />
-
     <!--Error Message-->
     <TextView
-        android:id="@+id/error_text"
+        android:id="@+id/edit_access_key_error_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/access_keys_did_not_match_please_try_again"
@@ -71,7 +47,7 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
 
 
     <Button
-        android:id="@+id/enable_rc_button_menu"
+        android:id="@+id/edit_access_key_save_new_access_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/black"
