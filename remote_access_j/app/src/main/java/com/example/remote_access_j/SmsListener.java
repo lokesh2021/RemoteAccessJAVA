@@ -19,9 +19,6 @@ import androidx.core.app.ActivityCompat;
 
 public class SmsListener extends BroadcastReceiver {
 
-    LocationManager locationManager;
-
-    //remote_access lokesh
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
@@ -76,8 +73,12 @@ public class SmsListener extends BroadcastReceiver {
             sendMessageHelp(msg_from);
             Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getlocation") && shrpf_ra_enabled.equals("yes")) {
+            String loc_lat = KeyValueDB.getSPData(context, "loc_lat");
+            String loc_long = KeyValueDB.getSPData(context, "loc_long");
+            sendSMSMessage(msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat="+loc_lat+"&long="+loc_long+"\nThe GPS co-ordinates are latitude:"+loc_lat+"& longitude:"+loc_long);
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && shrpf_ra_enabled.equals("yes")) {
-            Toast.makeText(context, "pswd auth successful :"+shrpf_ra_enabled+":"+shrpf_access_key, Toast.LENGTH_SHORT).show();
             sendSMSMessage(msg_from, "Password Authentication Successful");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1] != shrpf_access_key && shrpf_ra_enabled.equals("yes")) {
@@ -87,7 +88,7 @@ public class SmsListener extends BroadcastReceiver {
     }
 
     private void sendMessageHelp(String msg_from) {
-        String help_msg = "Help Instructions"; //"remote_access <password> <action>"
+        String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.ChangeProfile\n4.setLockScreen";
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(msg_from, null, help_msg, null, null);
     }

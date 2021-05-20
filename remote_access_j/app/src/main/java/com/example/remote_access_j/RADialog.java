@@ -3,6 +3,7 @@ package com.example.remote_access_j;
 import android.app.Dialog;
 import android.content.Context;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,7 +17,8 @@ import com.google.android.material.snackbar.Snackbar;
 public class RADialog extends AppCompatActivity {
     private static EditText access_key_inp, reenter_access_key_inp, sq_answer;
     private static TextView error_text;
-    private static ImageView enable_ra_button;
+    ConstraintLayout constraintLayout;
+    private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
 
     public RADialog() {
     }
@@ -52,7 +54,5 @@ public class RADialog extends AppCompatActivity {
             dialog.findViewById(R.id.error_text).setVisibility(View.VISIBLE);
             error_text.setText("Access keys did not match, please try again!!");
         }
-
-
     }
 }
