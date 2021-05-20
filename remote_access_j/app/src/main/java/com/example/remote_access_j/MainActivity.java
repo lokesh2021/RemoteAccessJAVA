@@ -1,6 +1,8 @@
 package com.example.remote_access_j;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -9,9 +11,13 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.telephony.TelephonyManager;
@@ -26,9 +32,18 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
     ConstraintLayout constraintLayout;
     private Spinner spinner;
     private static TextView welcome_to_ra, access_key_verif_error_text;
@@ -36,6 +51,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static ImageView ra_enabled_button_image_view, ra_enabled_icon;
     private EditText verification_access_key_text, forgot_access_key_security_answer_text, forgot_access_key_new_access_key_text, forgot_access_key_re_enter_new_access_key_text;
     private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
+
+    /******
+     * Used for Location
+     */
+    private Location location;
+    private GoogleApiClient googleApiClient;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private LocationRequest locationRequest;
+    private static final long UPDATE_INTERVAL = 10000, FASTEST_INTERVAL = 10000; // = 5 seconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +69,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
          to check if the required permission is enabled or not
          ******************************/
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintlayout);
-        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_NUMBERS, Manifest.permission.READ_PHONE_STATE};
-        TelephonyManager tMgr = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_NUMBERS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(permission, 1000);
         }
 
@@ -65,12 +91,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             settings_button.setVisibility(View.VISIBLE);
             ra_enabled_icon.setVisibility(View.VISIBLE);
             welcome_to_ra.setText("Remote Access Enabled");
+            GoogleApiClient();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                   onLocationChanged(location);
+                    handler.postDelayed(this, 5000);
+                }
+            }, 5000);
+
+
         }
 
 
-//        String mPhoneNumber = tMgr.getLine1Number();
-//        TextView contacttext = findViewById(R.id.contacttextview);
-//        contacttext.setText(mPhoneNumber);
+
+    }
+
+    private void GoogleApiClient() {
+        // we build google api client
+        googleApiClient = new GoogleApiClient.Builder(this).
+                addApi(LocationServices.API).
+                addConnectionCallbacks(this).
+                addOnConnectionFailedListener(this).build();
     }
 
     @Override
@@ -122,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     ra_enabled_icon.setVisibility(View.VISIBLE);
                     welcome_to_ra.setText("Remote Access Enabled");
                     Snackbar.make(constraintLayout, "!!! Remote Access Enabled !!!", Snackbar.LENGTH_LONG).show();
+                    recreate();
                 }
             }
         });
@@ -308,5 +351,109 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
         dialog.show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (googleApiClient != null) {
+            googleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!checkPlayServices()) {
+            Toast.makeText(this,"You need to install Google Play Services to use the App properly",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // stop location updates
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+            googleApiClient.disconnect();
+        }
+    }
+
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+            } else {
+                finish();
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        // Permissions ok, we get last location
+        location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        if (location != null) {
+            Toast.makeText(getApplicationContext(),"Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude(),Toast.LENGTH_SHORT).show();
+            KeyValueDB.setSPData(getApplicationContext(), "loc_lat", String.valueOf(location.getLatitude()));
+            KeyValueDB.setSPData(getApplicationContext(), "loc_long", String.valueOf(location.getLongitude()));
+
+        }
+
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setSmallestDisplacement(0);
+        locationRequest.setInterval(UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "You need to enable permissions to display location !", Toast.LENGTH_SHORT).show();
+        }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location != null) {
+            Toast.makeText(getApplicationContext(), "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+            KeyValueDB.setSPData(getApplicationContext(), "loc_lat", String.valueOf(location.getLatitude()));
+            KeyValueDB.setSPData(getApplicationContext(), "loc_long", String.valueOf(location.getLongitude()));
+        }
     }
 }

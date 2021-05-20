@@ -8,7 +8,6 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
     android:orientation="vertical"
     android:padding="10dp">
 
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,18 +31,18 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:onClick="showForgotPasswordDialog"
         android:text="Forgot Access Key?"
-        android:textColor="@color/primary_color_green"
-        android:onClick="showForgotPasswordDialog"/>
+        android:textColor="@color/primary_color_green" />
 
     <!--Error Message-->
     <TextView
         android:id="@+id/access_key_verif_error_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:text="@string/access_keys_did_not_match_please_try_again"
         android:textColor="@color/red"
-        android:layout_margin="10dp"
         android:visibility="invisible" />
 
 
