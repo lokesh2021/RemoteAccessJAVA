@@ -17,12 +17,11 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 
 
+
 public class SmsListener extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO Auto-generated method stub
-        //Toast.makeText(context,"Sms Received",Toast.LENGTH_SHORT).show();
         if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
             Bundle bundle = intent.getExtras();           //---get the SMS message passed in---
             SmsMessage[] msgs = null;
@@ -51,51 +50,51 @@ public class SmsListener extends BroadcastReceiver {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private void processReceivedMessage(Context context, String msg_from, String msgBody) {
         //get the access_key from sharedpreference
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
         String shrpf_ra_enabled = KeyValueDB.getSPData(context, "ra_enabled");
 
-        //responding to the message "remote_acess" with the message "Welcome Sir!, How can i help you?"
-        if (msgBody.equalsIgnoreCase("remote_access") && shrpf_ra_enabled.equals("yes")) {
-            Log.d("debugging", "Message received from: " + msg_from + " \nand the message is :" + msgBody);
-            //Toast.makeText(context, "Message received from: " + msg_from + " \nand the message is :" + msgBody, Toast.LENGTH_SHORT).show();
-            //sending SMS to the Sender
-            sendSMSMessage(msg_from, "Welcome Sir!, How can i help you?");
-            //Toast.makeText(context, "Access_key from sharepred is:" + shrpf_access_key, Toast.LENGTH_SHORT).show();
-            Log.d("debugging", "sharedpref value is : " + shrpf_access_key);
-            Log.d("debugging", "Remote Access has responded to the received SMS");
-            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
 
-        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access") //responding to the message "remote_acess --help" with instructions
+
+        //responding to the message "remote_access" with the message "Welcome Sir!, How can i help you?"
+        if (msgBody.equalsIgnoreCase("remote_access") && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess" with "Welcome Sir!, How can i help you?"
+            //sending SMS to the Sender
+            sendSMSMessage(context,msg_from, "Welcome Sir!, How can i help you?");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equalsIgnoreCase("--help") && shrpf_ra_enabled.equals("yes")) {
-            sendMessageHelp(msg_from);
-            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
+            //responds to the message "remote_acess --help" with instructions
+            String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.ChangeProfile\n4.setLockScreen";
+            //sending help instructions to the Sender
+            sendSMSMessage(context,msg_from,help_msg);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                &&msgBody.split(" ")[1].equalsIgnoreCase("password")
+                && msgBody.split(" ")[2].equals(shrpf_access_key) && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key>" if the <access_key> is correct
+            //sending SMS to the Sender
+            sendSMSMessage(context,msg_from, "Access Key Authentication Successful");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                &&msgBody.split(" ")[1].equalsIgnoreCase("password")
+                && msgBody.split(" ")[2] != shrpf_access_key && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key>" if the <access_key> is incorrect
+            //sending SMS to the Sender
+            sendSMSMessage(context,msg_from, "Incorrect Access Key, please try again!!!");
+        }else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getlocation") && shrpf_ra_enabled.equals("yes")) {
-            String loc_lat = KeyValueDB.getSPData(context, "loc_lat");
+            //responds to the message "remote_acess <access_key> getLocation" with the users location
+            String loc_lat = KeyValueDB.getSPData(context, "loc_lat");//getting the lat/long from ShrdPrefs
             String loc_long = KeyValueDB.getSPData(context, "loc_long");
-            sendSMSMessage(msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat="+loc_lat+"&long="+loc_long+"\nThe GPS co-ordinates are latitude:"+loc_lat+"& longitude:"+loc_long);
-        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && shrpf_ra_enabled.equals("yes")) {
-            sendSMSMessage(msg_from, "Password Authentication Successful");
-        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1] != shrpf_access_key && shrpf_ra_enabled.equals("yes")) {
-            sendSMSMessage(msg_from, "Wrong Password, please try again!!!");
-            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
+            //sending location link & co-ordinates to the Sender
+            sendSMSMessage(context,msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat="+loc_lat+"&long="+loc_long+"\nThe GPS co-ordinates are latitude:"+loc_lat+"& longitude:"+loc_long);
         }
     }
 
-    private void sendMessageHelp(String msg_from) {
-        String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.ChangeProfile\n4.setLockScreen";
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(msg_from, null, help_msg, null, null);
-    }
-
-    protected void sendSMSMessage(String msg_from, String msgBody) {
+    private void sendSMSMessage(Context context,String msg_from, String msgBody) {
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
+        Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
+
     }
 
 }
