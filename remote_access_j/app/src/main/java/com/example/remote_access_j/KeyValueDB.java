@@ -10,13 +10,13 @@ public class KeyValueDB {
      * SecurityQuestion= "sq_question"
      * SecurityAnswer= "sq_answer"
      * Remote Access Enabled= "ra_enabled"
+     * location Latitude = "loc_lat"
+     * location Longitute = "loc_lat"
      *
      */
-    private SharedPreferences sharedPreferences;
     private static String PREF_NAME = "prefs";
 
     public KeyValueDB() {
-        // Blank
     }
 
     private static SharedPreferences getPrefs(Context context) {
