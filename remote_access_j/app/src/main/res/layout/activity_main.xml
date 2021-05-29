@@ -54,11 +54,13 @@
                     android:visibility="invisible" />
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/contacttextview"
+            <Button
+                android:id="@+id/enable"
+                android:background="@color/white"
+                android:textColor="@color/green"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:text="lock perm enable"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/settings"

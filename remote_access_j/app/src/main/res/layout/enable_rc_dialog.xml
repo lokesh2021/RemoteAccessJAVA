@@ -13,6 +13,49 @@ Enable Remote Access Menu which is displayed after clicking on the Enable remote
         android:orientation="vertical"
         android:padding="10dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:text="Enable these permissions in order to use all the application features"
+            android:textColor="@color/green"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:src="@drawable/lock_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="0.75"
+                android:text="Lock Mobile"
+                android:textAlignment="center" />
+
+            <Switch
+                android:id="@+id/lock_p_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:checked="false" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="Add an Access key to access the features"
+            android:textColor="@color/green"
+            android:textSize="15sp" />
+
         <!--Access Key Input Field-->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -46,7 +89,8 @@ Enable Remote Access Menu which is displayed after clicking on the Enable remote
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="@string/choose_your_security_question" />
+            android:text="@string/choose_your_security_question"
+            android:textColor="@color/green" />
 
         <!--Choose your Security Question DropDown Menu(Spinner)-->
         <Spinner
@@ -66,7 +110,7 @@ Enable Remote Access Menu which is displayed after clicking on the Enable remote
                 android:id="@+id/sq_answer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Security Question Answer"/>
+                android:hint="Security Question Answer" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!--Error Message-->

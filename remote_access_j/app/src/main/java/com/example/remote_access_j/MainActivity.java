@@ -10,8 +10,11 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.Image;
@@ -61,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private LocationRequest locationRequest;
     private static final long UPDATE_INTERVAL = 5000, FASTEST_INTERVAL = 5000; // = 5 seconds
 
+    private ComponentName compName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +86,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ) {
             requestPermissions(permission, 1000);
         }
+
+        //lock device code
+        compName = new ComponentName(this, MyAdmin.class);
+
+        Button enable = findViewById(R.id.enable);
+        enable.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Clicked on lock permission", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Additional text explaining why we need this permission");
+                startActivityForResult(intent, 11);
+            }
+        });
 
         String ra_enabled = KeyValueDB.getSPData(getApplicationContext(), "ra_enabled");
         if (ra_enabled.equals("yes")) {
