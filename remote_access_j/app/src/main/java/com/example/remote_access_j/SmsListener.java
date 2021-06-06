@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
@@ -16,6 +20,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 
 public class SmsListener extends BroadcastReceiver {
@@ -55,7 +61,6 @@ public class SmsListener extends BroadcastReceiver {
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
         String shrpf_ra_enabled = KeyValueDB.getSPData(context, "ra_enabled");
 
-
         //responding to the message "remote_access" with the message "Welcome Sir!, How can i help you?"
         if (msgBody.equalsIgnoreCase("remote_access") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess" with "Welcome Sir!, How can i help you?"
@@ -87,10 +92,20 @@ public class SmsListener extends BroadcastReceiver {
             //sending location link & co-ordinates to the Sender
             sendSMSMessage(context, msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat=" + loc_lat + "&long=" + loc_long + "\nThe GPS co-ordinates are latitude:" + loc_lat + "& longitude:" + loc_long);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("setlock") && shrpf_ra_enabled.equals("yes")) {
-            //responds to the message "remote_acess <access_key> setlock"
-            LockDevice.lock(context);
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("lockscreen") && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key> lockscreen"
+            Services.lock(context);
             sendSMSMessage(context, msg_from, "Your Device is Locked");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("ringermode") && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key> ringermode"
+            Services.setRinger(context);
+            sendSMSMessage(context, msg_from, "Device sound is Enabled");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("makesound") && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key> makesound"
+            Services.makeSound(context, "start");
+            sendSMSMessage(context, msg_from, "Playing Ringtone on device...");
         }
     }
 
