@@ -16,15 +16,42 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:src="@drawable/seetings_icon_svg"
         android:layout_gravity="center"/>
 
+    <LinearLayout
+        android:layout_marginTop="30dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/lock_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.75"
+            android:text="Lock Mobile"
+            android:textAlignment="center" />
+
+        <Switch
+            android:id="@+id/settings_lock_p_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checked="false" />
+    </LinearLayout>
+
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/edit_access_key_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:letterSpacing="0.1"
         android:textStyle="bold"
-        android:backgroundTint="@color/green"
         android:padding="15dp"
         android:text="Edit Access Key"
         android:textSize="15sp"

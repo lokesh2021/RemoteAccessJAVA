@@ -9,7 +9,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,6 +20,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.Image;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,10 +33,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,11 +57,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     ConstraintLayout constraintLayout;
     private Spinner spinner;
     private static TextView welcome_to_ra, access_key_verif_error_text;
-    private static Button settings_button;
+    private static Button settings_button, stop_sound_button;
     private static ImageView ra_enabled_button_image_view, ra_enabled_icon;
     private EditText verification_access_key_text, forgot_access_key_security_answer_text, forgot_access_key_new_access_key_text, forgot_access_key_re_enter_new_access_key_text;
     private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
-
+    public static Switch lock_perm_switch;
     /******
      * Used for Location
      */
@@ -64,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private LocationRequest locationRequest;
     private static final long UPDATE_INTERVAL = 5000, FASTEST_INTERVAL = 5000; // = 5 seconds
 
+    private DevicePolicyManager devicePolicyManager;
+    private ActivityManager activityManager;
     private ComponentName compName;
 
     @Override
@@ -74,33 +83,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
          to check if the required permission is enabled or not
          ******************************/
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintlayout);
-        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_NUMBERS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_BACKGROUND_LOCATION};
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
+        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.MODIFY_AUDIO_SETTINGS};
+        if (ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[1]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[2]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[3]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[4]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[5]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[6]) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissions(permission, 1000);
         }
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !notificationManager.isNotificationPolicyAccessGranted()) {
+
+            Intent intent = new Intent(
+                    android.provider.Settings
+                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+
+            startActivity(intent);
+        }
 
         //lock device code
+        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         compName = new ComponentName(this, MyAdmin.class);
+        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
 
-        Button enable = findViewById(R.id.enable);
-        enable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "Clicked on lock permission", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-                intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
-                intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Additional text explaining why we need this permission");
-                startActivityForResult(intent, 11);
-            }
-        });
+        devicePolicyManager.removeActiveAdmin(compName);
 
         String ra_enabled = KeyValueDB.getSPData(getApplicationContext(), "ra_enabled");
         if (ra_enabled.equals("yes")) {
@@ -108,6 +122,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ra_enabled_button_image_view = findViewById(R.id.enable_rc_button);
             ra_enabled_icon = findViewById(R.id.ra_enabled_icon);
             settings_button = findViewById(R.id.settings);
+            if (Globals.SoundButton == 1) {
+                stop_sound_button = findViewById(R.id.stop_sound);
+                stop_sound_button.setVisibility(View.VISIBLE);
+                stop_sound_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Services.makeSound(getApplicationContext(), "stop");
+                        recreate();
+                        Globals.SoundButton = 0;
+                    }
+                });
+            }
             ra_enabled_button_image_view.setVisibility(View.INVISIBLE);
             settings_button.setVisibility(View.VISIBLE);
             ra_enabled_icon.setVisibility(View.VISIBLE);
@@ -116,14 +142,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                   onLocationChanged(location);
+                    onLocationChanged(location);
                     handler.postDelayed(this, 5000);
                 }
             }, 5000);
 
 
         }
-
 
 
     }
@@ -151,6 +176,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void showRCMenu(View v) {
         final Dialog dialog = new Dialog(this, R.style.CustomAlertDialog);
         dialog.setContentView(R.layout.enable_rc_dialog);
+        ComponentName compName = new ComponentName(this, MyAdmin.class);
+        /*boolean active = devicePolicyManager.isAdminActive(compName);
+        if (active) lock_perm_switch.setChecked(true);
+        else lock_perm_switch.setChecked(false);*/
+
+        lock_perm_switch = dialog.findViewById(R.id.lock_p_switch);
+        lock_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(MainActivity.this, "Clicked on lock permission", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                    intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+                    intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Additional text explaining why we need this permission");
+                    startActivityForResult(intent, 11);
+
+                    //Snackbar.make(constraintLayout, "!!! Switch Enabled !!!", Snackbar.LENGTH_LONG).show();
+                } else {
+                    devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+
+                    devicePolicyManager.removeActiveAdmin(compName);
+                    Toast.makeText(getApplicationContext(), "!!! LockDevice Permission/Feature Disabled !!!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         /**************************
          *Sequrity Question Spinner declaration and its working
@@ -258,8 +307,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dialog.setContentView(R.layout.settings_dialog);
 
         /*****************************
+         checks if lock permissions are enabled, if yes switch is enabled
+         ******************************/
+        boolean active = devicePolicyManager.isAdminActive(compName);
+        Switch setting_p_lock_switch = dialog.findViewById(R.id.settings_lock_p_switch);
+        if (active) setting_p_lock_switch.setChecked(true);
+        else setting_p_lock_switch.setChecked(false);
+        /*****************************
+         lock permission switch actions
+         ******************************/
+        setting_p_lock_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    Toast.makeText(MainActivity.this, "Clicked on lock permission", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+                    intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+                    intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Additional text explaining why we need this permission");
+                    startActivityForResult(intent, 11);
+
+                    //Snackbar.make(constraintLayout, "!!! Switch Enabled !!!", Snackbar.LENGTH_LONG).show();
+                } else {
+                    devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+
+                    devicePolicyManager.removeActiveAdmin(compName);
+                    Toast.makeText(getApplicationContext(), "!!! LockDevice Permission/Feature Disabled !!!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        /*****************************
          Performs the required task when the "verify access key" button is pressed
          ******************************/
+
         Button settings_edit_access_key_button = dialog.findViewById(R.id.edit_access_key_button);
         Button settings_disable_ra_button = (Button) dialog.findViewById(R.id.disable_ra_button);
         settings_edit_access_key_button.setOnClickListener(new View.OnClickListener() {
@@ -268,22 +348,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 dialog.dismiss();
                 showEditAccessKeyDialog();
             }
-
-
         });
+
+        /*****************************
+         disable remote access feature
+         ******************************/
 
         settings_disable_ra_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                KeyValueDB.setSPData(getApplicationContext(), "ra_enabled", "no");
-                Globals.RAEnabled = 0;
-                Toast.makeText(MainActivity.this, "Remote Access Disabled, You cannot access any features of this application untill you enable it again", Toast.LENGTH_LONG).show();
-                recreate();
+                DisableRA();
             }
 
 
         });
         dialog.show();
+    }
+
+    private void DisableRA() {
+        KeyValueDB.setSPData(getApplicationContext(), "ra_enabled", "no");
+        Globals.RAEnabled = 0;
+        Toast.makeText(MainActivity.this, "Remote Access Disabled, You cannot access any features of this application untill you enable it again", Toast.LENGTH_LONG).show();
+        recreate();
     }
 
     private void showEditAccessKeyDialog() {
@@ -388,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onResume();
 
         if (!checkPlayServices()) {
-            Toast.makeText(this,"You need to install Google Play Services to use the App properly",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -433,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
         if (location != null) {
-            Toast.makeText(getApplicationContext(),"Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude(),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
             KeyValueDB.setSPData(getApplicationContext(), "loc_lat", String.valueOf(location.getLatitude()));
             KeyValueDB.setSPData(getApplicationContext(), "loc_long", String.valueOf(location.getLongitude()));
 
@@ -463,10 +549,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onConnectionSuspended(int i) {
+
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        
     }
 
     @Override
