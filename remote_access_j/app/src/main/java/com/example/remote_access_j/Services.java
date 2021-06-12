@@ -8,9 +8,7 @@ import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.os.BatteryManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -49,5 +47,14 @@ public class Services extends AppCompatActivity {
             Globals.SoundButton = 0;
         }
 
+    }
+
+    public static int batteryStatus(Context context){
+        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            int percentage = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            return percentage;
+        }
+        return 0;
     }
 }
