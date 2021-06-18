@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
          to check if the required permission is enabled or not
          ******************************/
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintlayout);
-        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.MODIFY_AUDIO_SETTINGS};
+        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.MODIFY_AUDIO_SETTINGS,Manifest.permission.READ_CONTACTS};
         if (ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[1]) != PackageManager.PERMISSION_GRANTED
@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 && ActivityCompat.checkSelfPermission(this, permission[4]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[5]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[6]) != PackageManager.PERMISSION_GRANTED
+                /*&& ActivityCompat.checkSelfPermission(this, permission[7]) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission[8]) != PackageManager.PERMISSION_GRANTED*/
         ) {
             requestPermissions(permission, 1000);
         }
@@ -146,11 +148,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     handler.postDelayed(this, 5000);
                 }
             }, 5000);
-
-
         }
-
-
     }
 
     private void GoogleApiClient() {
@@ -563,5 +561,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             KeyValueDB.setSPData(getApplicationContext(), "loc_lat", String.valueOf(location.getLatitude()));
             KeyValueDB.setSPData(getApplicationContext(), "loc_long", String.valueOf(location.getLongitude()));
         }
+    }
+
+    public void showContacts(View view) {
+        Services services = new Services();
+        services.getPhoneNumbers(getApplicationContext());
     }
 }
