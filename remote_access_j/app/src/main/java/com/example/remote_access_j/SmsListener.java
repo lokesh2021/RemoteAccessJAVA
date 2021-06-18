@@ -46,9 +46,9 @@ public class SmsListener extends BroadcastReceiver {
                         msg_from = msgs[i].getOriginatingAddress();
                         msgBody = msgs[i].getMessageBody();
                     }
-                    /*****************************
+                    /***********
                      Performs Actions for the received messages
-                     ******************************/
+                     **********/
                     processReceivedMessage(context, msg_from, msgBody);
 
                 } catch (Exception e) {
@@ -62,64 +62,72 @@ public class SmsListener extends BroadcastReceiver {
         //get the access_key from sharedpreference
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
         String shrpf_ra_enabled = KeyValueDB.getSPData(context, "ra_enabled");
-
         //responding to the message "remote_access" with the message "Welcome Sir!, How can i help you?"
         if (msgBody.equalsIgnoreCase("remote_access") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess" with "Welcome Sir!, How can i help you?"
             //sending SMS to the Sender
-            sendSMSMessage(context, msg_from, "Welcome Sir!, How can i help you?\n");
+            sendSMSMessage(context, msg_from, "Welcome Sir!, How can i help you?\n", "no");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equalsIgnoreCase("--help") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess --help" with instructions
-            String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.ChangeProfile\n4.setLockScreen\n";
+            String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.makeSound\n4.setLockScreen\n";
             //sending help instructions to the Sender
-            sendSMSMessage(context, msg_from, help_msg);
-        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+            sendSMSMessage(context, msg_from, help_msg, "no");
+        } /*else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equalsIgnoreCase("password")
                 && msgBody.split(" ")[2].equals(shrpf_access_key) && shrpf_ra_enabled.equals("yes")) {
-            //responds to the message "remote_acess <access_key>" if the <access_key> is correct
+            //responds to the message "remote_access <access_key>" if the <access_key> is correct
             //sending SMS to the Sender
-            sendSMSMessage(context, msg_from, "Access Key Authentication Successful\n");
+            sendSMSMessage(context, msg_from, "Access Key Authentication Successful\n","no");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equalsIgnoreCase("password")
                 && msgBody.split(" ")[2] != shrpf_access_key && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key>" if the <access_key> is incorrect
             //sending SMS to the Sender
-            sendSMSMessage(context, msg_from, "Incorrect Access Key, please try again!!!\n");
-        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+            sendSMSMessage(context, msg_from, "Incorrect Access Key, please try again!!!\n","no");
+        }*/ else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getlocation") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key> getLocation" with the users location
             String loc_lat = KeyValueDB.getSPData(context, "loc_lat");//getting the lat/long from ShrdPrefs
             String loc_long = KeyValueDB.getSPData(context, "loc_long");
             //sending location link & co-ordinates to the Sender
-            sendSMSMessage(context, msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat=" + loc_lat + "&long=" + loc_long + "\nThe GPS co-ordinates are latitude:" + loc_lat + "& longitude:" + loc_long+"\n");
+            Log.d("Location: ", "Location Latitude" + loc_lat);
+            sendSMSMessage(context, msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat=" + loc_lat + "&long=" + loc_long +/*+ "\nThe GPS co-ordinates are latitude:" + loc_lat + "& longitude:" + loc_long+*/"\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("lockscreen") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key> lockscreen"
             Services.lock(context);
-            sendSMSMessage(context, msg_from, "Your Device is Locked\n");
+            sendSMSMessage(context, msg_from, "Your Device is Locked\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("ringermode") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key> ringermode"
             Services.setRinger(context);
-            sendSMSMessage(context, msg_from, "Device sound is Enabled\n");
+            sendSMSMessage(context, msg_from, "Device sound is Enabled\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("makesound") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key> makesound"
             Services.makeSound(context, "start");
-            sendSMSMessage(context, msg_from, "Playing Ringtone on device...\n");
+            sendSMSMessage(context, msg_from, "Playing Ringtone on device...\n", "yes");
+        } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getcontact") && shrpf_ra_enabled.equals("yes")) {
+            //responds to the message "remote_acess <access_key> getcontact <contact_name>"
+            String contact_name = msgBody.split(" ")[3].toLowerCase();
+            String contact_number = ContactsDB.getContact(context,contact_name);
+            sendSMSMessage(context, msg_from, "Contact Number of "+contact_name+" is: "+contact_number+"\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("batterystatus") && shrpf_ra_enabled.equals("yes")) {
-            sendSMSMessage(context, msg_from, "");
+            sendSMSMessage(context, msg_from, "", "yes");
         }
     }
 
-    private void sendSMSMessage(Context context, String msg_from, String msgBody) {
+    private void sendSMSMessage(Context context, String msg_from, String msgBody, String sendBatteryStatus) {
         int battery_status = Services.batteryStatus(context);
         SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(msg_from, null, msgBody + "Battery Status: " + battery_status + "%", null, null);
-        Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
-
+        if (sendBatteryStatus.equals("yes")) {
+            smsManager.sendTextMessage(msg_from, null, msgBody + "Battery Status: " + battery_status + "%", null, null);
+            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
+        } else {
+            smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
+        }
     }
-
 }
