@@ -149,6 +149,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }, 5000);
         }
+
+        Button showContacts = findViewById(R.id.show_contacts);
+        showContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Services services = new Services();
+                services.saveContacts(getApplicationContext());
+            }
+        });
+
     }
 
     private void GoogleApiClient() {
@@ -563,8 +573,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public void showContacts(View view) {
+/*    public void showContacts(View view) {
         Services services = new Services();
         services.getPhoneNumbers(getApplicationContext());
-    }
+    }*/
 }
