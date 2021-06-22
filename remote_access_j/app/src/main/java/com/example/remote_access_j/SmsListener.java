@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat;
 
 import static android.content.Context.BATTERY_SERVICE;
 import static androidx.core.content.ContextCompat.getSystemService;
+import static com.example.remote_access_j.Services.sendSMSMessage;
 
 
 public class SmsListener extends BroadcastReceiver {
@@ -111,23 +112,14 @@ public class SmsListener extends BroadcastReceiver {
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getcontact") && shrpf_ra_enabled.equals("yes")) {
             //responds to the message "remote_acess <access_key> getcontact <contact_name>"
-            String contact_name = msgBody.split(" ")[3].toLowerCase();
-            String contact_number = ContactsDB.getContact(context,contact_name);
-            sendSMSMessage(context, msg_from, "Contact Number of "+contact_name+" is: "+contact_number+"\n", "yes");
+            String contact_name = msgBody.split(" ")[3];
+            Services services = new Services();
+            services.getContactDetails(context,msg_from,contact_name);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("batterystatus") && shrpf_ra_enabled.equals("yes")) {
             sendSMSMessage(context, msg_from, "", "yes");
         }
     }
 
-    private void sendSMSMessage(Context context, String msg_from, String msgBody, String sendBatteryStatus) {
-        int battery_status = Services.batteryStatus(context);
-        SmsManager smsManager = SmsManager.getDefault();
-        if (sendBatteryStatus.equals("yes")) {
-            smsManager.sendTextMessage(msg_from, null, msgBody + "Battery Status: " + battery_status + "%", null, null);
-            Toast.makeText(context, "Remote Access has responded to the received SMS", Toast.LENGTH_LONG).show();
-        } else {
-            smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
-        }
-    }
+
 }

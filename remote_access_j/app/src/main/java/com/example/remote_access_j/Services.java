@@ -12,10 +12,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.provider.ContactsContract;
+import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
 import java.util.Map;
 
 public class Services extends AppCompatActivity {
@@ -52,7 +55,6 @@ public class Services extends AppCompatActivity {
             r.stop();
             Globals.SoundButton = 0;
         }
-
     }
 
     public static int batteryStatus(Context context) {
@@ -64,43 +66,68 @@ public class Services extends AppCompatActivity {
         return 0;
     }
 
-    public void getPhoneNumbers(Context context) {
+    public void saveContacts(Context context) {
 
         Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
-        // Loop Through All The Numbers
         long startnow;
         long endnow;
 
         startnow = android.os.SystemClock.uptimeMillis();
 
-        while (phones.moveToNext()) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ContactsDataBase contactsDataBase = ContactsDataBase.getInstance(context);
+                // Loop Through All The Numbers
+                while (phones.moveToNext()) {
 
-            String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-            // Cleanup the phone number
-            phoneNumber = phoneNumber.replaceAll("[()\\s-]+", "");
+                    // Cleanup the phone number
+                    phoneNumber = phoneNumber.replaceAll("[()\\s-]+", "");
 
-            // Enter Into Hash Map
-            //Globals.contactMap.put(name, phoneNumber);
-            ContactsDB.setContact(context,name,phoneNumber);
-
-        }
-
+                    //saving the contact details in the ContactsDataBase
+                    Contacts contact = new Contacts(name.toLowerCase(), phoneNumber);
+                    contactsDataBase.ContactsDoa().insertContacts(contact);
+                }
+                phones.close();
+            }
+        });
         endnow = android.os.SystemClock.uptimeMillis();
-
-        // Get The Contents of Hash Map in Log
-        for (Map.Entry<String, String> entry : Globals.contactMap.entrySet()) {
-            String key = entry.getKey();
-            Log.d("contact", "Phone :" + key);
-            String value = entry.getValue();
-            Log.d("contact", "Name :" + value);
-        }
-
-        String contact_number = ContactsDB.getContact(context,"MOM");
-        phones.close();
-        Log.d("contact", "total contacts is: " + Globals.contactMap.size()+" "+contact_number);
         Log.d("MYTAG", "Execution time to save contacts is: " + (endnow - startnow) + " ms");
     }
+
+    public void getContactDetails(Context context, String msg_from, String name) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ContactsDataBase contactsDataBase = ContactsDataBase.getInstance(context);
+                //loading all the contacts that start with <name> into result_from_database
+                List<Contacts> result_from_database = contactsDataBase.ContactsDoa().loadContacts(name + "%");
+                int contacts_list_size = result_from_database.size();
+                String result = "";
+                //adding all the similar contacts into the string to reply
+                for (int i = 0; i < contacts_list_size; i++) {
+                    result += result_from_database.get(i).getContact_name() + ": " + result_from_database.get(i).getContact_number() + "\n";
+                }
+                Log.d("contact_result", result);
+                sendSMSMessage(context, msg_from, result, "yes");
+            }
+        });
+
+    }
+
+    public static void sendSMSMessage(Context context, String msg_from, String msgBody, String sendBatteryStatus) {
+        int battery_status = Services.batteryStatus(context);
+        SmsManager smsManager = SmsManager.getDefault();
+        if (sendBatteryStatus.equals("yes")) {
+            smsManager.sendTextMessage(msg_from, null, msgBody + "Battery Status: " + battery_status + "%", null, null);
+            Log.d("debug", "Remote Access has responded to the received SMS");
+        } else {
+            smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
+        }
+    }
+
 }
