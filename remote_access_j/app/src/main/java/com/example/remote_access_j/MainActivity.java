@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static ImageView ra_enabled_button_image_view, ra_enabled_icon;
     private EditText verification_access_key_text, forgot_access_key_security_answer_text, forgot_access_key_new_access_key_text, forgot_access_key_re_enter_new_access_key_text;
     private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
-    public static Switch lock_perm_switch;
+    public static Switch lock_perm_switch, setting_p_lock_switch, contacts_perm_switch, setting_p_contacts_switch ;
     /******
      * Used for Location
      */
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
          to check if the required permission is enabled or not
          ******************************/
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintlayout);
-        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.MODIFY_AUDIO_SETTINGS,Manifest.permission.READ_CONTACTS};
+        final String[] permission = new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.MODIFY_AUDIO_SETTINGS, Manifest.permission.READ_CONTACTS};
         if (ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[0]) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission[1]) != PackageManager.PERMISSION_GRANTED
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             ra_enabled_button_image_view = findViewById(R.id.enable_rc_button);
             ra_enabled_icon = findViewById(R.id.ra_enabled_icon);
             settings_button = findViewById(R.id.settings);
+
             if (Globals.SoundButton == 1) {
                 stop_sound_button = findViewById(R.id.stop_sound);
                 stop_sound_button.setVisibility(View.VISIBLE);
@@ -136,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 });
             }
+
             ra_enabled_button_image_view.setVisibility(View.INVISIBLE);
             settings_button.setVisibility(View.VISIBLE);
             ra_enabled_icon.setVisibility(View.VISIBLE);
@@ -149,16 +152,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }, 5000);
         }
-
-        Button showContacts = findViewById(R.id.show_contacts);
-        showContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Services services = new Services();
-                services.saveContacts(getApplicationContext());
-            }
-        });
-
     }
 
     private void GoogleApiClient() {
@@ -208,6 +201,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+
+        contacts_perm_switch = dialog.findViewById(R.id.contacts_p_switch);
+
+        String contacts_saved = KeyValueDB.getSPData(getApplicationContext(), "contacts_saved");
+        if (contacts_saved.equals("yes")) {
+            contacts_perm_switch.setChecked(true);
+            Log.d("contacts", "contacts_saved = \"yes\"");
+
+        } else {
+            contacts_perm_switch.setChecked(false);
+            Log.d("contacts", "contacts_saved = \"no\"");
+
+        }
+
+        contacts_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Services services = new Services();
+                if (isChecked) {
+                    services.saveContacts(getApplicationContext());
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "yes");
+                    Log.d("contacts", "contacts saved in DB");
+                    Toast.makeText(MainActivity.this, "Contacts Permission Enabled!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    services.DeleteContactTable(getApplicationContext());
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "no");
+                    Log.d("contacts", "contacts deleted from DB");
+                    Toast.makeText(MainActivity.this, "Contacts Permission Disabled!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
         /**************************
          *Sequrity Question Spinner declaration and its working
@@ -318,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
          checks if lock permissions are enabled, if yes switch is enabled
          ******************************/
         boolean active = devicePolicyManager.isAdminActive(compName);
-        Switch setting_p_lock_switch = dialog.findViewById(R.id.settings_lock_p_switch);
+        setting_p_lock_switch = dialog.findViewById(R.id.settings_lock_p_switch);
         if (active) setting_p_lock_switch.setChecked(true);
         else setting_p_lock_switch.setChecked(false);
         /*****************************
@@ -343,6 +369,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+
+        setting_p_contacts_switch = dialog.findViewById(R.id.settings_contacts_p_switch);
+        String contacts_saved = KeyValueDB.getSPData(getApplicationContext(), "contacts_saved");
+        if (contacts_saved.equals("yes")) {
+            setting_p_contacts_switch.setChecked(true);
+            Log.d("contacts", "contacts_saved = \"yes\"");
+
+        } else {
+            setting_p_contacts_switch.setChecked(false);
+            Log.d("contacts", "contacts_saved = \"no\"");
+
+        }
+
+        setting_p_contacts_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Services services = new Services();
+                if (isChecked) {
+                    services.saveContacts(getApplicationContext());
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "yes");
+                    Toast.makeText(MainActivity.this, "Contacts Permission Enabled!!", Toast.LENGTH_SHORT).show();
+                    Log.d("contacts", "contacts saved in DB");
+                } else {
+                    services.DeleteContactTable(getApplicationContext());
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "no");
+                    Log.d("contacts", "contacts deleted from DB");
+                    Toast.makeText(MainActivity.this, "Contacts Permission Disabled!!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+
+
 
         /*****************************
          Performs the required task when the "verify access key" button is pressed
@@ -561,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        
+
     }
 
     @Override
@@ -572,9 +631,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             KeyValueDB.setSPData(getApplicationContext(), "loc_long", String.valueOf(location.getLongitude()));
         }
     }
-
-/*    public void showContacts(View view) {
-        Services services = new Services();
-        services.getPhoneNumbers(getApplicationContext());
-    }*/
 }
