@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 Edit Remote Access Menu which is displayed after clicking on the Edit remote access button in the main_activity.xml layout
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="20dp"
     android:orientation="vertical"
     android:padding="10dp">
@@ -13,13 +12,41 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/seetings_icon_svg"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:src="@drawable/seetings_icon_svg" />
 
     <LinearLayout
-        android:layout_marginTop="30dp"
+
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/contacts_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.75"
+            android:text="Get Contacts Permission"
+            android:textAlignment="center" />
+
+        <Switch
+            android:id="@+id/settings_contacts_p_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checked="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -32,7 +59,7 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_weight="0.75"
-            android:text="Lock Mobile"
+            android:text="Lock Mobile Permission"
             android:textAlignment="center" />
 
         <Switch
@@ -43,6 +70,61 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
             android:checked="false" />
     </LinearLayout>
 
+    <!--<LinearLayout
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/gps_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.75"
+            android:text="Location Permission"
+            android:textAlignment="center" />
+
+        <Switch
+            android:id="@+id/settings_location_p_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checked="false" />
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:layout_marginTop="30dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/sound_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="0.75"
+            android:text="Sound Permission"
+            android:textAlignment="center" />
+
+        <Switch
+            android:id="@+id/settings_sound_p_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checked="false" />
+    </LinearLayout>-->
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/edit_access_key_button"
@@ -51,10 +133,10 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
         android:letterSpacing="0.1"
-        android:textStyle="bold"
         android:padding="15dp"
         android:text="Edit Access Key"
         android:textSize="15sp"
+        android:textStyle="bold"
         android:visibility="visible"
         app:cornerRadius="10dp" />
 
@@ -63,15 +145,15 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:letterSpacing="0.1"
-        android:textStyle="bold"
         android:backgroundTint="@color/white"
-        android:textColor="@color/green"
-        app:strokeColor="@color/green"
-        app:strokeWidth="1dp"
+        android:letterSpacing="0.1"
         android:padding="15dp"
         android:text="Disable Remote Access"
+        android:textColor="@color/green"
         android:textSize="15sp"
+        android:textStyle="bold"
         android:visibility="visible"
-        app:cornerRadius="10dp" />
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/green"
+        app:strokeWidth="1dp" />
 </LinearLayout>

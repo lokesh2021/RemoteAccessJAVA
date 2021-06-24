@@ -104,30 +104,53 @@ public class Services extends AppCompatActivity {
             @Override
             public void run() {
                 ContactsDataBase contactsDataBase = ContactsDataBase.getInstance(context);
+
                 //loading all the contacts that start with <name> into result_from_database
                 List<Contacts> result_from_database = contactsDataBase.ContactsDoa().loadContacts(name + "%");
                 int contacts_list_size = result_from_database.size();
                 String result = "";
+
                 //adding all the similar contacts into the string to reply
                 for (int i = 0; i < contacts_list_size; i++) {
                     result += result_from_database.get(i).getContact_name() + ": " + result_from_database.get(i).getContact_number() + "\n";
                 }
-                Log.d("contact_result", result);
-                sendSMSMessage(context, msg_from, result, "yes");
+
+                //if contact couldnt be found return a error message
+                if (result.isEmpty()) {
+                    String empty_contact_msg = "There was an error accessing the contacts, please try again with a different contact name!!\n";
+                    Log.d("contact", empty_contact_msg);
+                    sendSMSMessage(context, msg_from, empty_contact_msg, "yes");
+                } else {
+                    sendSMSMessage(context, msg_from, result, "yes");
+                    Log.d("contact", result);
+
+
+                }
             }
         });
 
+    }
+
+    public void DeleteContactTable(Context context) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                ContactsDataBase contactsDataBase = ContactsDataBase.getInstance(context);
+                contactsDataBase.ContactsDoa().DeleteContactsTable();
+            }
+        });
     }
 
     public static void sendSMSMessage(Context context, String msg_from, String msgBody, String sendBatteryStatus) {
         int battery_status = Services.batteryStatus(context);
         SmsManager smsManager = SmsManager.getDefault();
         if (sendBatteryStatus.equals("yes")) {
-            smsManager.sendTextMessage(msg_from, null, msgBody + "Battery Status: " + battery_status + "%", null, null);
+            smsManager.sendTextMessage(msg_from, null, msgBody + "> Battery Status: " + battery_status + "%", null, null);
             Log.d("debug", "Remote Access has responded to the received SMS");
         } else {
             smsManager.sendTextMessage(msg_from, null, msgBody, null, null);
         }
     }
+
 
 }

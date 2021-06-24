@@ -17,13 +17,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <Button
-                android:id="@+id/show_contacts"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="getcontact"
-                />
-
             <TextView
                 android:id="@+id/welcome_to_ra"
                 android:layout_width="wrap_content"
