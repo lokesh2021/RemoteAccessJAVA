@@ -8,6 +8,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+//DataBase table name
 @Entity(tableName = "contacts_table")
 public class Contacts {
     @PrimaryKey(autoGenerate = true)
@@ -17,6 +18,7 @@ public class Contacts {
     @ColumnInfo(name = "contact_number")
     private String contact_number;
 
+    //Parameterized Constructor
     public Contacts(int id, String contact_name, String contact_number) {
         this.id = id;
         this.contact_name = contact_name;
@@ -28,6 +30,9 @@ public class Contacts {
         this.contact_name = contact_name;
         this.contact_number = contact_number;
     }
+
+
+    //getters and setters for the DataBase Attributes
     public int getId() {
         return id;
     }

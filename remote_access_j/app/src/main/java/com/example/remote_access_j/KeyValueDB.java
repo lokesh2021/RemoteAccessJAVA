@@ -12,7 +12,7 @@ public class KeyValueDB {
      * Remote Access Enabled= "ra_enabled"
      * location Latitude = "loc_lat"
      * location Longitute = "loc_lat"
-     *
+     * OTP Message = "otp_message"
      */
     private static String PREF_NAME = "prefs";
 
