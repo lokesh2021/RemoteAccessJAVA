@@ -70,8 +70,7 @@ public class Services extends AppCompatActivity {
 
         Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
-        long startnow;
-        long endnow;
+        long startnow, endnow;
 
         startnow = android.os.SystemClock.uptimeMillis();
 
@@ -123,12 +122,9 @@ public class Services extends AppCompatActivity {
                 } else {
                     sendSMSMessage(context, msg_from, result, "yes");
                     Log.d("contact", result);
-
-
                 }
             }
         });
-
     }
 
     public void DeleteContactTable(Context context) {
