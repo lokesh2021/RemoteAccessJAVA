@@ -73,7 +73,7 @@ Enable Remote Access Menu which is displayed after clicking on the Enable remote
                 android:checked="false" />
         </LinearLayout>
 
-        <!--<LinearLayout
+        <LinearLayout
 
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
@@ -124,7 +124,7 @@ Enable Remote Access Menu which is displayed after clicking on the Enable remote
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:checked="false" />
-        </LinearLayout>-->
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

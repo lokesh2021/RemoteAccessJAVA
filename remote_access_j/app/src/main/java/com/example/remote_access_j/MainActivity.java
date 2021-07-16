@@ -2,10 +2,8 @@ package com.example.remote_access_j;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -15,20 +13,12 @@ import android.app.NotificationManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.media.Image;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
-import android.speech.tts.TextToSpeech;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,7 +27,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -51,8 +40,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     ConstraintLayout constraintLayout;
@@ -62,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static ImageView ra_enabled_button_image_view, ra_enabled_icon;
     private EditText verification_access_key_text, forgot_access_key_security_answer_text, forgot_access_key_new_access_key_text, forgot_access_key_re_enter_new_access_key_text;
     private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
-    public static Switch lock_perm_switch, setting_p_lock_switch, contacts_perm_switch, setting_p_contacts_switch ;
+    public static Switch lock_perm_switch, contacts_perm_switch, setting_p_lock_switch, setting_p_contacts_switch,location_perm_switch, sound_perm_switch, setting_p_location_switch, setting_p_sound_switch ;
     /******
      * Used for Location
      */
@@ -132,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 stop_sound_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Services.makeSound(getApplicationContext(), "stop");
+                        //Services.makeSound(getApplicationContext(), "stop", msg_from);
                         recreate();
                         Globals.SoundButton = 0;
                     }
@@ -203,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
         contacts_perm_switch = dialog.findViewById(R.id.contacts_p_switch);
-
         String contacts_saved = KeyValueDB.getSPData(getApplicationContext(), "contacts_saved");
         if (contacts_saved.equals("yes")) {
             contacts_perm_switch.setChecked(true);
@@ -214,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d("contacts", "contacts_saved = \"no\"");
 
         }
-
         contacts_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -233,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+
+
 
 
         /**************************
@@ -615,12 +602,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
