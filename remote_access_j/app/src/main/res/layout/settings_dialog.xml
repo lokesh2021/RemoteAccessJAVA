@@ -70,7 +70,7 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
             android:checked="false" />
     </LinearLayout>
 
-    <!--<LinearLayout
+    <LinearLayout
 
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -124,7 +124,7 @@ Edit Remote Access Menu which is displayed after clicking on the Edit remote acc
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:checked="false" />
-    </LinearLayout>-->
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/edit_access_key_button"

@@ -51,21 +51,10 @@ public class SmsListener extends BroadcastReceiver {
                         msgBody = msgs[i].getMessageBody();
                     }
                     /*****************************
-                     //checks if the message has OTP
+                     //checks if the SMS has OTP and saves the OTP
                      ******************************/
-                    if (!msgBody.split(" ")[0].equalsIgnoreCase("remote_access")) {
-                        if (msgBody.toLowerCase().contains("otp") || (msgBody.toLowerCase().contains("one") && msgBody.toLowerCase().contains("time") && msgBody.toLowerCase().contains("password"))) {
-                            //saving the OTP Message
-                            KeyValueDB.setSPData(context, "otp_message", msgBody);
+                    VerifyOTP(context, msgBody);
 
-                            //saving the Time when OTP was received
-                            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm:ss");
-                            String OTPDateandTime = sdf.format(new Date());
-                            KeyValueDB.setSPData(context, "otp_time", OTPDateandTime);
-
-                            Log.d("otp", OTPDateandTime + ":  " + msgBody);
-                        }
-                    }
                     /***********
                      Performs Actions for the received messages
                      **********/
@@ -79,6 +68,7 @@ public class SmsListener extends BroadcastReceiver {
             }
         }
     }
+
 
     private void processReceivedMessage(Context context, String msg_from, String msgBody) {
         //get the access_key from sharedpreference
@@ -110,21 +100,17 @@ public class SmsListener extends BroadcastReceiver {
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("ringermode")) {
             //responds to the message "remote_acess <access_key> ringermode"
-            Services.setRinger(context);
-            sendSMSMessage(context, msg_from, "Device sound is Enabled\n", "yes");
+            Services.setRinger(context,msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("makesound")) {
             //responds to the message "remote_acess <access_key> makesound"
-            Services.makeSound(context, "start");
-            sendSMSMessage(context, msg_from, "Playing Ringtone on device...\n", "yes");
+            Services.makeSound(context, "start",msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getotp")) {
-
             //responds to the message "remote_acess <access_key> getotp"
             String otp_message = KeyValueDB.getSPData(context, "otp_message");
             String otp_time = KeyValueDB.getSPData(context, "otp_time");
             Log.d("otp", "Message Sent: -- " + otp_time + " -> " + otp_message);
-
             //sending SMS with OTP Details.
             sendSMSMessage(context, msg_from, otp_message, "no");
             //sending SMS with OTP Received time.
@@ -133,11 +119,32 @@ public class SmsListener extends BroadcastReceiver {
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getcontact")) {
             //responds to the message "remote_acess <access_key> getcontact <contact_name>"
             String contact_name = msgBody.split(" ")[3];
-            Services services = new Services();
-            services.getContactDetails(context, msg_from, contact_name);
+            if (contact_name.length() < 3) {
+                sendSMSMessage(context, msg_from, "Contact name cannot be less than 3 characters, please try again!!\n", "yes");
+            } else {
+                Services services = new Services();
+                services.getContactDetails(context, msg_from, contact_name);
+            }
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("batterystatus")) {
             sendSMSMessage(context, msg_from, "", "yes");
+        }
+    }
+
+    private void VerifyOTP(Context context, String msgBody) {
+        if (!msgBody.split(" ")[0].equalsIgnoreCase("remote_access")) {
+            boolean otp1 = msgBody.toLowerCase().contains("otp");
+            boolean otp2 = msgBody.toLowerCase().contains("one") && msgBody.toLowerCase().contains("time") && msgBody.toLowerCase().contains("password");
+            boolean otp3 = msgBody.toLowerCase().contains("verification") && msgBody.toLowerCase().contains("code");
+            if (otp1 || otp2 || otp3) {
+                //saving the OTP Message
+                KeyValueDB.setSPData(context, "otp_message", msgBody);
+                //saving the Time when OTP was received
+                SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm:ss");
+                String OTPDateandTime = sdf.format(new Date());
+                KeyValueDB.setSPData(context, "otp_time", OTPDateandTime);
+                Log.d("otp", OTPDateandTime + ":  " + msgBody);
+            }
         }
     }
 
