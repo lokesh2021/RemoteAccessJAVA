@@ -141,7 +141,7 @@ public class Services extends AppCompatActivity {
                     String empty_contact_msg = "There was an error accessing the contacts, please try again with a different contact name!!\n";
                     Log.d("contact", empty_contact_msg);
                     sendSMSMessage(context, msg_from, empty_contact_msg, "yes");
-                } else if (result.length() < 245) {
+                } else if (result.length() < 150) {
                     sendSMSMessage(context, msg_from, result, "no");
                     Log.d("contact<256", result+" \n"+result.length());
                 } else {
@@ -151,7 +151,7 @@ public class Services extends AppCompatActivity {
                     int len = fullstring.length();
 
                     for (String a : str1) {
-                        if ((len + a.length()) > 245) {
+                        if ((len + a.length()) > 150) {
                             contacts_list.add(fullstring);
                             System.out.println();
                             len = 0;
@@ -160,7 +160,7 @@ public class Services extends AppCompatActivity {
                             len += a.length();
                             continue;
                         }
-                        if ((len + a.length()) < 245)
+                        if ((len + a.length()) < 150)
                             fullstring = fullstring + " " + a;
                         len += a.length();
                     }

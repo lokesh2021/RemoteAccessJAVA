@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static ImageView ra_enabled_button_image_view, ra_enabled_icon;
     private EditText verification_access_key_text, forgot_access_key_security_answer_text, forgot_access_key_new_access_key_text, forgot_access_key_re_enter_new_access_key_text;
     private static final String[] security_ques = {"What Is your favorite book?", "What is your mother’s maiden name?", "Where did you go to high school/college?"};
-    public static Switch lock_perm_switch, contacts_perm_switch, setting_p_lock_switch, setting_p_contacts_switch,location_perm_switch, sound_perm_switch, setting_p_location_switch, setting_p_sound_switch ;
+    public static Switch lock_perm_switch, contacts_perm_switch, setting_p_lock_switch, setting_p_contacts_switch, location_perm_switch, sound_perm_switch, setting_p_location_switch, setting_p_sound_switch;
     /******
      * Used for Location
      */
@@ -189,15 +189,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        /**************************
+         *Contacts Permission switch working in Enable Remote Access Dialog
+         **************************/
         contacts_perm_switch = dialog.findViewById(R.id.contacts_p_switch);
-        String contacts_saved = KeyValueDB.getSPData(getApplicationContext(), "contacts_saved");
-        if (contacts_saved.equals("yes")) {
+        String contacts_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "contacts_switch_enabled");
+        if (contacts_switch_enabled.equals("yes")) {
             contacts_perm_switch.setChecked(true);
-            Log.d("contacts", "contacts_saved = \"yes\"");
+            Log.d("contacts", "contacts_switch_enabled = \"yes\"");
 
         } else {
             contacts_perm_switch.setChecked(false);
-            Log.d("contacts", "contacts_saved = \"no\"");
+            Log.d("contacts", "contacts_switch_enabled = \"no\"");
 
         }
         contacts_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -206,20 +209,80 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Services services = new Services();
                 if (isChecked) {
                     services.saveContacts(getApplicationContext());
-                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "yes");
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_switch_enabled", "yes");
                     Log.d("contacts", "contacts saved in DB");
                     Toast.makeText(MainActivity.this, "Contacts Permission Enabled!!", Toast.LENGTH_SHORT).show();
 
                 } else {
                     services.DeleteContactTable(getApplicationContext());
-                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "no");
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_switch_enabled", "no");
                     Log.d("contacts", "contacts deleted from DB");
                     Toast.makeText(MainActivity.this, "Contacts Permission Disabled!!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        /**************************
+         *Location Permission switch working in Enable Remote Access Dialog
+         **************************/
+        location_perm_switch = dialog.findViewById(R.id.location_p_switch);
+        String location_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "location_switch_enabled");
+        if (location_switch_enabled.equals("yes")) {
+            location_perm_switch.setChecked(true);
+            Log.d("contacts", "location_switch_enabled = \"yes\"");
 
+        } else {
+            location_perm_switch.setChecked(false);
+            Log.d("contacts", "contacts_switch_enabled = \"no\"");
+
+        }
+        location_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Services services = new Services();
+                if (isChecked) {
+                    KeyValueDB.setSPData(getApplicationContext(), "location_switch_enabled", "yes");
+                    Log.d("location", "Location Permission enabled");
+                    Toast.makeText(MainActivity.this, "Location Permission Enabled!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    KeyValueDB.setSPData(getApplicationContext(), "location_switch_enabled", "no");
+                    Log.d("location", "Location permission Disabled");
+                    Toast.makeText(MainActivity.this, "Location Permission Disabled!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        /**************************
+         *Sound Permission switch working in Enable Remote Access Dialog
+         **************************/
+        sound_perm_switch = dialog.findViewById(R.id.sound_p_switch);
+        String sound_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "sound_switch_enabled");
+        if (sound_switch_enabled.equals("yes")) {
+            sound_perm_switch.setChecked(true);
+            Log.d("sound", "sound_switch_enabled = \"yes\"");
+
+        } else {
+            location_perm_switch.setChecked(false);
+            Log.d("sound", "sound_switch_enabled = \"no\"");
+
+        }
+        sound_perm_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Services services = new Services();
+                if (isChecked) {
+                    KeyValueDB.setSPData(getApplicationContext(), "sound_switch_enabled", "yes");
+                    Log.d("sound", "sound Permission enabled");
+                    Toast.makeText(MainActivity.this, "sound Permission Enabled!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    KeyValueDB.setSPData(getApplicationContext(), "sound_switch_enabled", "no");
+                    Log.d("sound", "Sound permission Disabled");
+                    Toast.makeText(MainActivity.this, "Sound Permission Disabled!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
 
         /**************************
@@ -357,30 +420,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+        /**************************
+         *Contacts Permission switch working in Enable Remote Access Dialog
+         **************************/
         setting_p_contacts_switch = dialog.findViewById(R.id.settings_contacts_p_switch);
-        String contacts_saved = KeyValueDB.getSPData(getApplicationContext(), "contacts_saved");
-        if (contacts_saved.equals("yes")) {
+        String contacts_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "contacts_switch_enabled");
+        if (contacts_switch_enabled.equals("yes")) {
             setting_p_contacts_switch.setChecked(true);
-            Log.d("contacts", "contacts_saved = \"yes\"");
+            Log.d("contacts", "contacts_switch_enabled = \"yes\"");
 
         } else {
             setting_p_contacts_switch.setChecked(false);
-            Log.d("contacts", "contacts_saved = \"no\"");
+            Log.d("contacts", "contacts_switch_enabled = \"no\"");
 
         }
-
         setting_p_contacts_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Services services = new Services();
                 if (isChecked) {
                     services.saveContacts(getApplicationContext());
-                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "yes");
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_switch_enabled", "yes");
                     Toast.makeText(MainActivity.this, "Contacts Permission Enabled!!", Toast.LENGTH_SHORT).show();
                     Log.d("contacts", "contacts saved in DB");
                 } else {
                     services.DeleteContactTable(getApplicationContext());
-                    KeyValueDB.setSPData(getApplicationContext(), "contacts_saved", "no");
+                    KeyValueDB.setSPData(getApplicationContext(), "contacts_switch_enabled", "no");
                     Log.d("contacts", "contacts deleted from DB");
                     Toast.makeText(MainActivity.this, "Contacts Permission Disabled!!", Toast.LENGTH_SHORT).show();
 
@@ -388,6 +453,66 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+
+        /**************************
+         *Location Permission switch working in Enable Remote Access Dialog
+         **************************/
+        setting_p_location_switch = dialog.findViewById(R.id.settings_location_p_switch);
+        String location_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "location_switch_enabled");
+        if (location_switch_enabled.equals("yes")) {
+            setting_p_location_switch.setChecked(true);
+            Log.d("contacts", "location_switch_enabled = \"yes\"");
+
+        } else {
+            setting_p_location_switch.setChecked(false);
+            Log.d("contacts", "contacts_switch_enabled = \"no\"");
+
+        }
+        setting_p_location_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    KeyValueDB.setSPData(getApplicationContext(), "location_switch_enabled", "yes");
+                    Log.d("location", "Location Permission enabled");
+                    Toast.makeText(MainActivity.this, "Location Permission Enabled!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    KeyValueDB.setSPData(getApplicationContext(), "location_switch_enabled", "no");
+                    Log.d("location", "Location permission Disabled");
+                    Toast.makeText(MainActivity.this, "Location Permission Disabled!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        /**************************
+         *Sound Permission switch working in Enable Remote Access Dialog
+         **************************/
+        setting_p_sound_switch = dialog.findViewById(R.id.settings_sound_p_switch);
+        String sound_switch_enabled = KeyValueDB.getSPData(getApplicationContext(), "sound_switch_enabled");
+        if (sound_switch_enabled.equals("yes")) {
+            setting_p_sound_switch.setChecked(true);
+            Log.d("sound", "sound_switch_enabled = \"yes\"");
+
+        } else {
+            setting_p_sound_switch.setChecked(false);
+            Log.d("sound", "sound_switch_enabled = \"no\"");
+
+        }
+        setting_p_sound_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    KeyValueDB.setSPData(getApplicationContext(), "sound_switch_enabled", "yes");
+                    Log.d("sound", "sound Permission enabled");
+                    Toast.makeText(MainActivity.this, "sound Permission Enabled!!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    KeyValueDB.setSPData(getApplicationContext(), "sound_switch_enabled", "no");
+                    Log.d("sound", "Sound permission Disabled");
+                    Toast.makeText(MainActivity.this, "Sound Permission Disabled!!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
 
         /*****************************
@@ -413,14 +538,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 DisableRA();
             }
-
-
         });
         dialog.show();
     }
 
     private void DisableRA() {
         KeyValueDB.setSPData(getApplicationContext(), "ra_enabled", "no");
+        KeyValueDB.setSPData(getApplicationContext(), "contacts_switch_enabled", "no");
+        KeyValueDB.setSPData(getApplicationContext(), "location_switch_enabled", "no");
+        KeyValueDB.setSPData(getApplicationContext(), "sound_switch_enabled", "no");
         Globals.RAEnabled = 0;
         Toast.makeText(MainActivity.this, "Remote Access Disabled, You cannot access any features of this application untill you enable it again", Toast.LENGTH_LONG).show();
         recreate();
