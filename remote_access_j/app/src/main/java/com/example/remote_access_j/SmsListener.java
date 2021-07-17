@@ -73,38 +73,44 @@ public class SmsListener extends BroadcastReceiver {
     private void processReceivedMessage(Context context, String msg_from, String msgBody) {
         //get the access_key from sharedpreference
         String shrpf_access_key = KeyValueDB.getSPData(context, "access_key");
+        String shrpf_contacts_switch = KeyValueDB.getSPData(context, "contacts_switch_enabled");
+        String shrpf_location_switch = KeyValueDB.getSPData(context, "location_switch_enabled");
+        String shrpf_sound_switch = KeyValueDB.getSPData(context, "sound_switch_enabled");
+
         //responding to the message "remote_access" with the message "Welcome Sir!, How can i help you?"
         if (msgBody.equalsIgnoreCase("remote_access")) {
             //responds to the message "remote_acess" with "Welcome Sir!, How can i help you?"
             //sending SMS to the Sender
-            sendSMSMessage(context, msg_from, "Welcome Sir!, How can i help you?\n", "no");
+            sendSMSMessage(context, msg_from, "Welcome to Remote Access!, How can i help you?\n", "no");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equalsIgnoreCase("--help")) {
             //responds to the message "remote_acess --help" with instructions
-            String help_msg = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.makeSound\n4.setLockScreen\n";
+            String help_msg1 = "Help Info:\nMessage format: remote_access <password> <action>\nActions Available:\n1.getContact <contactname>\n2.getLocation\n3.lockscreen\n4.ringermode\n5.makeSound";
+            String help_msg2 = "6.batterystatus\n7.getotp";
             //sending help instructions to the Sender
-            sendSMSMessage(context, msg_from, help_msg, "no");
+            sendSMSMessage(context, msg_from, help_msg1, "no");
+            sendSMSMessage(context, msg_from, help_msg2, "no");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getlocation")) {
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getlocation") && shrpf_location_switch.equals("yes")) {
             //responds to the message "remote_acess <access_key> getLocation" with the users location
             String loc_lat = KeyValueDB.getSPData(context, "loc_lat");//getting the lat/long from ShrdPrefs
             String loc_long = KeyValueDB.getSPData(context, "loc_long");
             //sending location link & co-ordinates to the Sender
             Log.d("Location: ", "Location Latitude" + loc_lat);
-            sendSMSMessage(context, msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat=" + loc_lat + "&long=" + loc_long +/*+ "\nThe GPS co-ordinates are latitude:" + loc_lat + "& longitude:" + loc_long+*/"\n", "yes");
+            sendSMSMessage(context, msg_from, "Your Mobile Location is at: https://www.latlong.net/c/?lat=" + loc_lat + "&long=" + loc_long +"\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("lockscreen")) {
             //responds to the message "remote_acess <access_key> lockscreen"
             Services.lock(context);
             sendSMSMessage(context, msg_from, "Your Device is Locked\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("ringermode")) {
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("ringermode") && shrpf_sound_switch.equals("yes")) {
             //responds to the message "remote_acess <access_key> ringermode"
-            Services.setRinger(context,msg_from);
+            Services.setRinger(context, msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("makesound")) {
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("makesound") && shrpf_sound_switch.equals("yes")) {
             //responds to the message "remote_acess <access_key> makesound"
-            Services.makeSound(context, "start",msg_from);
+            Services.makeSound(context, "start", msg_from);
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
                 && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getotp")) {
             //responds to the message "remote_acess <access_key> getotp"
@@ -116,7 +122,7 @@ public class SmsListener extends BroadcastReceiver {
             //sending SMS with OTP Received time.
             sendSMSMessage(context, msg_from, "Time when the OTP was saved: " + otp_time + "\n", "yes");
         } else if (msgBody.split(" ")[0].equalsIgnoreCase("remote_access")
-                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getcontact")) {
+                && msgBody.split(" ")[1].equals(shrpf_access_key) && msgBody.split(" ")[2].equalsIgnoreCase("getcontact") && shrpf_contacts_switch.equals("yes")) {
             //responds to the message "remote_acess <access_key> getcontact <contact_name>"
             String contact_name = msgBody.split(" ")[3];
             if (contact_name.length() < 3) {
