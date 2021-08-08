@@ -1,2 +1,3 @@
+include ':javaStuff'
 include ':app'
 rootProject.name = "remote_access_j"
